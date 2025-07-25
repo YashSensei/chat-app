@@ -2,7 +2,11 @@ import { Send } from "lucide-react";
 
 const PREVIEW_MESSAGES = [
   { id: 1, content: "Hey! How's it going?", isSent: false },
-  { id: 2, content: "I'm doing great! Just working on some new features.", isSent: true },
+  {
+    id: 2,
+    content: "I'm doing great! Just working on some new features.",
+    isSent: true,
+  },
 ];
 
 const SettingsPage = () => {
@@ -10,7 +14,9 @@ const SettingsPage = () => {
     <div className="h-screen container mx-auto px-4 pt-20 max-w-5xl">
       <div className="space-y-6">
         <h2 className="text-lg font-semibold">Settings</h2>
-        <p className="text-sm text-base-content/70 mb-4">App settings and preferences</p>
+        <p className="text-sm text-base-content/70 mb-4">
+          App settings and preferences
+        </p>
 
         {/* Preview Section */}
         <h3 className="text-lg font-semibold mb-3">Preview</h3>
@@ -18,7 +24,10 @@ const SettingsPage = () => {
           <div className="p-4 bg-base-200">
             <div className="max-w-lg mx-auto">
               {/* Mock Chat UI */}
-              <div className="bg-base-100 rounded-xl shadow-sm overflow-hidden" data-theme="luxury">
+              <div
+                className="bg-base-100 rounded-xl shadow-sm overflow-hidden"
+                data-theme="luxury"
+              >
                 {/* Chat Header */}
                 <div className="px-4 py-3 border-b border-base-300 bg-base-100">
                   <div className="flex items-center gap-3">
@@ -37,19 +46,29 @@ const SettingsPage = () => {
                   {PREVIEW_MESSAGES.map((message) => (
                     <div
                       key={message.id}
-                      className={`flex ${message.isSent ? "justify-end" : "justify-start"}`}
+                      className={`flex ${
+                        message.isSent ? "justify-end" : "justify-start"
+                      }`}
                     >
                       <div
                         className={`
                           max-w-[80%] rounded-xl p-3 shadow-sm
-                          ${message.isSent ? "bg-primary text-primary-content" : "bg-base-200"}
+                          ${
+                            message.isSent
+                              ? "bg-primary text-primary-content"
+                              : "bg-base-200"
+                          }
                         `}
                       >
                         <p className="text-sm">{message.content}</p>
                         <p
                           className={`
                             text-[10px] mt-1.5
-                            ${message.isSent ? "text-primary-content/70" : "text-base-content/70"}
+                            ${
+                              message.isSent
+                                ? "text-primary-content/70"
+                                : "text-base-content/70"
+                            }
                           `}
                         >
                           12:00 PM
