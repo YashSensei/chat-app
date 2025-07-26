@@ -30,6 +30,13 @@ type Client struct {
 	UserID primitive.ObjectID // The ID of the user associated with this connection
 }
 
+// WebSocketMessage defines the generic structure for messages sent over WebSocket.
+// This allows the frontend to identify the type of event.
+type WebSocketMessage struct {
+	Event   string      `json:"event"`   // e.g., "getOnlineUsers", "newMessage"
+	Payload interface{} `json:"payload"` // The actual data for the event
+}
+
 // Hub manages the WebSocket clients (connections) and broadcasting.
 // This is the Go equivalent of Socket.IO's server instance and userSocketMap.
 type Hub struct {
@@ -81,9 +88,12 @@ func (h *Hub) Run() {
 			h.mu.Unlock()
 
 			if ok {
-				// If the receiver is online, send the message to their connection.
-				// Marshal the message struct to JSON before sending.
-				msgJSON, err := json.Marshal(message)
+				// Wrap the message in our generic WebSocketMessage structure.
+				wsMessage := WebSocketMessage{
+					Event:   "newMessage", // The event name the frontend expects
+					Payload: message,      // The actual message data
+				}
+				msgJSON, err := json.Marshal(wsMessage) // Marshal the wrapped message
 				if err != nil {
 					log.Printf("Error marshaling message for receiver %s: %v", message.ReceiverID.Hex(), err)
 					continue
@@ -112,9 +122,10 @@ func (h *Hub) sendOnlineUsers() {
 
 	// Create a structured message for online users, similar to Socket.IO's event.
 	// The frontend will expect an event like "getOnlineUsers".
-	onlineUsersMessage := gin.H{
-		"event": "getOnlineUsers",
-		"users": onlineUserIDs,
+	// Now using the generic WebSocketMessage struct.
+	onlineUsersMessage := WebSocketMessage{
+		Event:   "getOnlineUsers",
+		Payload: onlineUserIDs, // The list of user IDs
 	}
 
 	msgJSON, err := json.Marshal(onlineUsersMessage)

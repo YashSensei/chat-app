@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
-import { io } from "socket.io-client";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5001" : "/";
+// WS_URL for WebSocket connection
+const WS_URL = import.meta.env.MODE === "development" ? "ws://localhost:5000/ws" : "wss://your-production-domain.com/ws"; // Use wss:// for production HTTPS
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -12,14 +12,13 @@ export const useAuthStore = create((set, get) => ({
   isUpdatingProfile: false,
   isCheckingAuth: true,
   onlineUsers: [],
-  socket: null,
+  socket: null, // This will now hold a native WebSocket object
 
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
-
       set({ authUser: res.data });
-      get().connectSocket();
+      get().connectSocket(); // Connect WebSocket after successful auth check
     } catch (error) {
       console.log("Error in checkAuth:", error);
       set({ authUser: null });
@@ -34,7 +33,7 @@ export const useAuthStore = create((set, get) => ({
       const res = await axiosInstance.post("/auth/signup", data);
       set({ authUser: res.data });
       toast.success("Account created successfully");
-      get().connectSocket();
+      get().connectSocket(); // Connect WebSocket after successful signup
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
@@ -48,8 +47,7 @@ export const useAuthStore = create((set, get) => ({
       const res = await axiosInstance.post("/auth/login", data);
       set({ authUser: res.data });
       toast.success("Logged in successfully");
-
-      get().connectSocket();
+      get().connectSocket(); // Connect WebSocket after successful login
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
@@ -62,7 +60,7 @@ export const useAuthStore = create((set, get) => ({
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
       toast.success("Logged out successfully");
-      get().disconnectSocket();
+      get().disconnectSocket(); // Disconnect WebSocket on logout
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -84,22 +82,56 @@ export const useAuthStore = create((set, get) => ({
 
   connectSocket: () => {
     const { authUser } = get();
-    if (!authUser || get().socket?.connected) return;
+    // Only connect if authUser exists and socket is not already open
+    if (!authUser || (get().socket && get().socket.readyState === WebSocket.OPEN)) {
+      return;
+    }
 
-    const socket = io(BASE_URL, {
-      query: {
-        userId: authUser._id,
-      },
-    });
-    socket.connect();
+    // Create a new native WebSocket connection
+    const socket = new WebSocket(WS_URL);
 
-    set({ socket: socket });
+    // Event listener for when the WebSocket connection is established
+    socket.onopen = () => {
+      console.log("WebSocket connected to Go backend!");
+    };
 
-    socket.on("getOnlineUsers", (userIds) => {
-      set({ onlineUsers: userIds });
-    });
+    // Event listener for incoming messages from the WebSocket
+    socket.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data); // Parse the JSON message from Go backend
+        console.log("Received WebSocket message:", data);
+
+        // MODIFIED: Read payload for getOnlineUsers.
+        // Removed the `else` block as `useChatStore` now handles "newMessage" directly.
+        if (data.event === "getOnlineUsers") {
+          set({ onlineUsers: data.payload });
+        }
+        // No `else if (data.event === "newMessage")` here.
+        // `useChatStore`'s `subscribeToMessages` will handle "newMessage" events directly
+        // by listening to the same `socket` instance.
+      } catch (e) {
+        console.error("Error parsing WebSocket message:", e, event.data);
+      }
+    };
+
+    // Event listener for WebSocket errors
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    // Event listener for when the WebSocket connection is closed
+    socket.onclose = (event) => {
+      console.log("WebSocket disconnected:", event.code, event.reason);
+      set({ socket: null, onlineUsers: [] }); // Clear socket and online users on close
+    };
+
+    set({ socket: socket }); // Store the native WebSocket object in state
   },
+
   disconnectSocket: () => {
-    if (get().socket?.connected) get().socket.disconnect();
+    if (get().socket && get().socket.readyState === WebSocket.OPEN) {
+      get().socket.close(); // Close the native WebSocket connection
+    }
+    set({ socket: null, onlineUsers: [] }); // Clear state
   },
 }));
