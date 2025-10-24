@@ -1,13 +1,38 @@
-# 💬 Chat App - Frontend
+# Chat App - Frontend
 
-Modern, responsive React frontend for the real-time chat application with beautiful UI, real-time messaging, and seamless user experience.
+This is the React frontend for the Chat App (Vite + React).
 
-![Screenshot](public/screenshot-for-readme.png)
+What this frontend does:
+- Uses Axios to call backend REST APIs for authentication, user lists and messages.
+- Uses native WebSocket API to receive real-time events (online users and incoming messages).
 
-## 🎨 Features
+Deployed link: (add your frontend deployed URL here)
 
-### User Interface
-- ✨ **Modern Design** - Clean, gradient-based UI with backdrop blur effects
+HTTP requests used by the frontend (examples):
+- POST /api/auth/signup — body: { fullName, email, password }
+- POST /api/auth/login — body: { email, password }
+- POST /api/auth/logout — no body
+- GET /api/auth/check — no body (returns current user)
+- PUT /api/auth/update-profile — body: { profilePic: base64String }
+- GET /api/messages/users — no body (returns users list)
+- GET /api/messages/:id — no body (returns message history)
+- POST /api/messages/send/:id — body: { text?, image? }
+
+WebSocket
+- Connect to: ws://localhost:5000/ws (development) or wss://<your-domain>/ws (production)
+- The backend authenticates the connection using the JWT cookie.
+- Events: { event: "getOnlineUsers", payload: [...] } and { event: "newMessage", payload: { ... } }
+
+How to run (development):
+```
+cd frontend
+npm install
+npm run dev
+```
+
+Environment sample: `frontend/.env.sample` (API base URL and WS URL)
+
+If you want additional examples of request/response shapes or to remove/add endpoints, tell me which ones and I will update this file.
 - 📱 **Fully Responsive** - Optimized for both mobile and desktop
 - 🎭 **Multiple Themes** - Theme switcher with 10+ DaisyUI themes
 - 🌓 **Dark Mode Support** - Beautiful dark theme options

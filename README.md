@@ -1,19 +1,21 @@
-# 💬 Real-Time Chat Application
+# Chat App
 
-A modern, full-stack real-time chat application built with **Go** backend and **React** frontend, featuring WebSocket communication, JWT authentication, and cloud-based image storage.
+This repository contains a full-stack real-time chat application.
 
-![Chat App](frontend/public/screenshot-for-readme.png)
+What this project is:
+- A Go (Gin) backend that provides REST APIs and a WebSocket endpoint for real-time messaging.
+- A React + Vite frontend that uses Zustand for state, Axios for HTTP requests and the native WebSocket API for real-time updates.
 
-## 🚀 Features
+Deployed link: (add your deployed URL here)
 
-### Core Functionality
-- 🔐 **Secure Authentication** - JWT-based authentication with HTTP-only cookies
-- 💬 **Real-Time Messaging** - Instant message delivery using native WebSockets
-- 👥 **Online User Tracking** - See who's online in real-time
-- 🖼️ **Image Sharing** - Upload and share images in chats (Cloudinary integration)
-- 📱 **Responsive Design** - Beautiful UI that works on desktop and mobile
-- 🎨 **Theme Switching** - Multiple theme options with DaisyUI
-- 👤 **Profile Management** - Update profile pictures and user information
+Supported HTTP endpoints (examples):
+
+Authentication
+- POST /api/auth/signup — create a new user. Body: { fullName, email, password } → returns user object (no password) and sets a JWT cookie.
+- POST /api/auth/login — login existing user. Body: { email, password } → returns user object and sets JWT cookie.
+- POST /api/auth/logout — clears auth cookie.
+- GET /api/auth/check — returns the authenticated user's data (requires cookie).
+- PUT /api/auth/update-profile — update profile picture. Body: { profilePic: base64String }
 
 ### Technical Features
 - ⚡ **Fast Performance** - Go backend for high-performance message handling
