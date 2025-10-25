@@ -6,11 +6,34 @@ What this project is:
 - A Go (Gin) backend that provides REST APIs and a WebSocket endpoint for real-time messaging.
 - A React + Vite frontend that uses Zustand for state, Axios for HTTP requests and the native WebSocket API for real-time updates.
 
-Deployed link: (add your deployed URL here)
+**Deployed link:** (add your deployed URL here)
+
+---
+
+## ⚠️ SECURITY WARNING
+
+**NEVER commit `.env` files to git!** This repository includes `.env.sample` files as templates.
+
+Your `.env` files contain sensitive credentials:
+- MongoDB connection strings with passwords
+- JWT secret keys
+- Cloudinary API keys and secrets
+
+**Before pushing to GitHub:**
+1. Verify `.env` files are in `.gitignore` ✅ (already configured)
+2. Use `.env.sample` files as templates
+3. If you accidentally committed secrets:
+   - Rotate all credentials immediately (MongoDB password, JWT secret, Cloudinary keys)
+   - Use `git filter-branch` or BFG Repo-Cleaner to remove from history
+   - Force push the cleaned repository
+
+---
+
+## API Endpoints
 
 Supported HTTP endpoints (examples):
 
-Authentication
+**Authentication**
 - POST /api/auth/signup — create a new user. Body: { fullName, email, password } → returns user object (no password) and sets a JWT cookie.
 - POST /api/auth/login — login existing user. Body: { email, password } → returns user object and sets JWT cookie.
 - POST /api/auth/logout — clears auth cookie.

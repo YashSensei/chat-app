@@ -7,10 +7,25 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+go-backend/vendor
+
+# Build outputs
 dist
 dist-ssr
 *.local
+frontend/dist
+go-backend/bin
+
+# Environment files - NEVER COMMIT THESE
+.env
+.env.local
+.env.production
+.env.development
+*.env
+go-backend/.env
+frontend/.env
 
 # Editor directories and files
 .vscode/*
@@ -23,4 +38,15 @@ dist-ssr
 *.sln
 *.sw?
 
-.env
+# OS files
+Thumbs.db
+.DS_Store
+
+# Go specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
